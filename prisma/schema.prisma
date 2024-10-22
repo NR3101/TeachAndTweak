@@ -1,0 +1,48 @@
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DATABASE_URL_UNPOOLED")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// models
+
+model User {
+  id               String       @id @default(cuid())
+  email            String       @unique
+  name             String?
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+  lessonPlans      LessonPlan[]
+  stripeCustomerId String?
+}
+
+model LessonPlan {
+  id           String    @id @default(cuid())
+  title        String
+  duration     Int
+  subject      String
+  sections     Section[]
+  userId       String
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  topic        String
+  subtopic     String
+  objective    String
+  studentLevel String
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+model Section {
+  id           String     @id @default(cuid())
+  title        String
+  content      String
+  lessonPlanId String
+  lessonPlan   LessonPlan @relation(fields: [lessonPlanId], references: [id], onDelete: Cascade)
+  duration     Int
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+}
